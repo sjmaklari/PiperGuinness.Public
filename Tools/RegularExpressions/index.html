@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Builder and Explainer</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50e3c2;
+            --background-color: #f5f7fa;
+            --text-color: #333;
+            --border-radius: 10px;
+        }
+        body {
+            background: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+        h1 {
+            color: var(--primary-color);
+            font-size: 3rem;
+            text-shadow: 2px 2px var(--secondary-color);
+            animation: fadeInDown 1s;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: background-color 0.3s, transform 0.3s;
+            border-radius: var(--border-radius);
+        }
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+        .list-group-item {
+            background-color: #ffffff;
+            border: 1px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 5px;
+            animation: fadeInUp 0.5s;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            animation: fadeIn 1s;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-control {
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+        }
+        .mt-4 h3 {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .google-like-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            transition: all 0.3s;
+        }
+        .google-like-input:focus {
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        .animate__fadeIn {
+            animation: fadeIn 1s;
+        }
+        .animate__fadeInUp {
+            animation: fadeInUp 0.5s;
+        }
+        .animate__fadeInDown {
+            animation: fadeInDown 1s;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function App() {
+            const [regex, setRegex] = useState('');
+            const [testString, setTestString] = useState('');
+            const [matches, setMatches] = useState([]);
+            const [naturalLanguage, setNaturalLanguage] = useState('');
+            const [explanation, setExplanation] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            useEffect(() => {
+                if (regex) {
+                    document.getElementById('regexInput').classList.add('google-like-input');
+                }
+            }, [regex]);
+
+            const handleRegexChange = (e) => {
+                setRegex(e.target.value);
+            };
+
+            const handleTestStringChange = (e) => {
+                setTestString(e.target.value);
+            };
+
+            const handleNaturalLanguageChange = (e) => {
+                setNaturalLanguage(e.target.value);
+            };
+
+            const testRegex = () => {
+                try {
+                    const re = new RegExp(regex, 'g');
+                    const matchArray = [...testString.matchAll(re)];
+                    setMatches(matchArray);
+                    explainRegex(regex);
+                } catch (error) {
+                    alert('Invalid regular expression');
+                }
+            };
+
+            const explainRegex = (regex) => {
+                // Placeholder for AI integration to explain regex
+                setExplanation(`Explanation for: ${regex}`);
+                setLoading(false);
+            };
+
+            const generateRegexFromNaturalLanguage = async () => {
+                setLoading(true);
+                try {
+                    const response = await fetch('https://api.example.com/generate-regex', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ prompt: naturalLanguage })
+                    });
+                    const data = await response.json();
+                    const generatedRegex = data.regex;
+                    setRegex(generatedRegex);
+                    explainRegex(generatedRegex);
+                } catch (error) {
+                    alert('Error generating regex from natural language');
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="container mt-5 animate__animated animate__fadeIn">
+                    <h1 className="text-center animate__animated animate__fadeInDown">Regex Builder and Explainer</h1>
+                    <div className="form-group">
+                        <label htmlFor="naturalLanguageInput">Natural Language Prompt</label>
+                        <input
+                            type="text"
+                            className="form-control google-like-input"
+                            id="naturalLanguageInput"
+                            value={naturalLanguage}
+                            onChange={handleNaturalLanguageChange}
+                            placeholder="Enter your natural language prompt here"
+                        />
+                        <button className="btn btn-primary mt-2" onClick={generateRegexFromNaturalLanguage}>Generate Regex</button>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="regexInput">Regular Expression</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="regexInput"
+                            value={regex}
+                            onChange={handleRegexChange}
+                            placeholder="Enter your regex here"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="testStringInput">Test String</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="testStringInput"
+                            value={testString}
+                            onChange={handleTestStringChange}
+                            placeholder="Enter the string to test against"
+                        />
+                    </div>
+                    <button className="btn btn-primary" onClick={testRegex}>Test Regex</button>
+                    <div className="mt-4">
+                        <h3>Matches</h3>
+                        <ul className="list-group">
+                            {matches.map((match, index) => (
+                                <li key={index} className="list-group-item animate__animated animate__fadeInUp">
+                                    {match[0]}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className={`mt-4 ${loading ? 'hidden' : 'visible'}`}>
+                        <h3>Explanation</h3>
+                        <p>{explanation}</p>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
